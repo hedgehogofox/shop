@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>{% block title %}Оптомастер{% endblock %}</title>
+    <link href="{% static "css/base.css" %}" rel="stylesheet">
+</head>
+<body>
+<div id="header">
+	<table class="t_1">
+	<tr>
+	<td>г.Саратов, ул. Новоузенская, 214А</td>
+	<td style="text-align: centering;"><a href='/#del_block'>Доставка</a></td>
+	<td style="text-align: centering;"><a href='/#contacts'>Контакты</a></td>
+	<td style="text-align: centering;"><a href="https://yandex.ru/maps/194/saratov/?ll=45.969658%2C51.539038&mode=poi&poi%5Bpoint%5D=45.969467%2C51.539136&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D1183729404&z=18.6">Как проехать?</a></td>
+	<td style="text-align: right;">+7 (8452) 52-52-52</td>
+	</tr>
+	<tr>
+	<td><a id="show-hours-form-button" style="text-decoration:underline;">Часы работы</a></td>
+	<td></td><td></td><td></td>
+	<td style="text-align: right;"><a id="show-order-form-button_all" style="text-decoration:underline;">Заказать звонок</a></td>
+	</tr>
+	</table>
+	<table class="t_1" style="margin: 20px 0 0 0;">
+	<tr>
+	<td style="width: 210px;"><a href="/" class="logo"><img src="{% static "images/logo.png" %}" class="img"></a></td>
+	<td style="text-align: centering;"><div class="catalog" id="show-catalog"><img src="{% static "images/lines.png" %}" class="lines">Каталог</div><td>
+	<td><form action="{% url 'shop_app:search_results' %}" method="get" class="search-form">
+  		<input name="q" type="text" placeholder="Найдите подходящий товар" class="search-input">
+		<input type="submit" value="Поиск" class="search-button" style="padding:0 60px;">
+    		{% csrf_token %}
+	</form></td>
+	<td style="text-align: right;"><div><a href="{% url "cart:cart_detail" %}">
+  		<img src="{% static "images/cart.png" %}" class="img_cart">
+  		
+		{% with total_items=cart|length %}
+        	{% if cart|length > 0 %}
+                	<span>{{ total_items }}</span>
+        	{% endif %}
+    	{% endwith %}
+	</a></div></td>
+	</tr>
+	</table>
+    
+</div>
+<div id="content">
+    {% block content %}
+    {% endblock %}
+</div>
+<div id="footer">
+	<div class="left_div">
+		<p><a href="/" class="logo"><img src="{% static "images/logo.png" %}" class="img"></a></p>
+		<p style="margin: 43px 0 0 0;">&copy; 2025 &laquo;ОптМастер&raquo;</p>
+		<p>Магазин сантехники и сантехнического оборудования</p>
+		
+		<p style="margin: 20px 0 0 0;">Цены на сайте могут отличаться от цен в розничном магазине.</p>
+		<p>При копировании информации ссылка на сайт обязательна.</p>
+	</div>
+	<div style="margin: 44px 0 0;">
+		<table>
+			<tr>
+				<td><a href="/">Главная</a></td>
+				<td><a href="{% url "shop_app:product_list_by_category" 'bath'%}">Ванны и поддоны</a></td>
+				<td><a href="{% url "shop_app:product_list_by_category" 'sink'%}">Кухонные мойки</a></td>
+			</tr>
+			<tr>
+				<td><a href="/#catalog_block">Каталог</a></td>
+				<td><a href="{% url "shop_app:product_list_by_category" 'sanfayance'%}">Санфаянс</a></td>
+				<td><a href="{% url "shop_app:product_list_by_category" 'bathroom_accessories'%}">Аксессуары для ванной</a></td>
+			</tr>
+			<tr>
+				<td><a href='/#del_block'>Доставка</a></td>
+				<td><a href="{% url "shop_app:product_list_by_category" 'furniture'%}">Мебель для ванной</a></td>
+				<td><a href="{% url "shop_app:product_list_by_category" 'towel_rail'%}">Сушители для полотенец</a></td>
+			</tr>
+			<tr>
+				<td><a href="https://yandex.ru/maps/194/saratov/?ll=45.969658%2C51.539038&mode=poi&poi%5Bpoint%5D=45.969467%2C51.539136&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D1183729404&z=18.6">Как проехать</a></td>
+				<td><a href="{% url "shop_app:product_list_by_category" 'faucet'%}">Смесители и системы для душа</a></td>
+				<td><a href="{% url "shop_app:product_list_by_category" 'plumbing'%}">Инженерная сантехника</a></td>
+			</tr>
+		</table>
+	</div>
+	<div style="text-align: right;">
+		<p>Контакты</p>
+		<p>+7 (8452) 52-52-52</p>
+		<p>optmaster@bk.ru</p>
+		<p>Время работы:</p>
+		<p>ПН-ПТ 9:00-17:00</p>
+		<p>СБ 9:00-16:00</p>
+	</div>
+</div>
+
+
+<div id="popup_hours">
+    <div id="popup_h">
+    <p>ПН-ПТ 9:00-17:00</p>
+    <p>СБ 9:00-16:00</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() { // Ensure DOM is loaded
+    const popupHours = document.getElementById("popup_hours");
+    const popupH = document.getElementById("popup_h");
+
+    function showPopupH() {
+        popupHours.style.display = "block";
+    }
+
+    function hidePopupH() {
+        popupHours.style.display = "none";
+    }
+
+    popupHours.addEventListener("mouseenter", hidePopupH);
+    popupH.addEventListener("mouseenter", (event) => event.stopPropagation());
+
+    const showOrderFormButton = document.getElementById("show-hours-form-button");
+        showOrderFormButton.addEventListener("mouseenter", showPopupH);
+});
+</script>
+
+{%if order%}
+<div id="popup-overlay_all" style="display: block;">
+    <div id="popup_all">
+    <h1 style="text-align:center;">Заказ успешно оформлен</h1>
+    <img src="{% static "images/ok.png" %}" style="width:300px; height=300px; margin:0 100px;">
+    <p><a href="/" class="pop_button" style="margin-left:65px;">Перейти на главную &#8594;</a><p>
+    </div>
+</div>
+{%else%}
+<div id="popup-overlay_all">
+    <div id="popup_all">
+    <a class="close" id="close">&#10006;</a>
+    <h1>Заказать звонок</h1>
+    <p style="color: rgba(102, 102, 102, 1); font-size:16px;">Оставьте заявку на обратный звонок, и мы свяжемся с вами в течение дня в рабочее время</p>
+    <form action="." method="post" class="order-form">
+        {{ form.as_p }}
+	<p style="color: rgba(102, 102, 102, 1); font-size:14px;">* - обязательно для заполнения</p>
+        <p><input type="submit" value="Заказать звонок"></p>
+    {% csrf_token %}
+    </form>
+    
+    <p style="color: rgba(102, 102, 102, 1); font-size:14px;">Нажимая на кнопку, вы даёте согласие на обработку персональных данных и соглашаетесь с политикой конфиденциальности.</p>
+    </div>
+</div>
+
+
+{%endif%}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() { // Ensure DOM is loaded
+    const popupOverlayAll = document.getElementById("popup-overlay_all");
+    const popupAll = document.getElementById("popup_all");
+
+    function showPopupAll() {
+        popupOverlayAll.style.display = "block";
+    }
+
+    function hidePopupAll() {
+        popupOverlayAll.style.display = "none";
+    }
+
+    popupOverlayAll.addEventListener("click", hidePopupAll);
+    popupAll.addEventListener("click", (event) => event.stopPropagation());
+
+    const showOrderFormButton = document.getElementById("show-order-form-button_all");
+        showOrderFormButton.addEventListener("click", showPopupAll);
+    const closeOrderFormButton = document.getElementById("close");
+        closeOrderFormButton.addEventListener("click", hidePopupAll);
+});
+</script>
+
+
+<div id="popup_catalog">
+    <div id="popup_c">
+    <p><a href="{% url "shop_app:product_list_by_category" 'bathroom_accessories'%}"><span>Аксессуары для ванной</span><span style="font-size:30px;">&#8250;</span></a></p>
+    <p><a href="{% url "shop_app:product_list_by_category" 'bath'%}"><span>Ванны и поддоны</span><span style="font-size:30px;">&#8250;</span></a></p>
+    <p><a href="{% url "shop_app:product_list_by_category" 'plumbing'%}"><span>Инженерная сантехника</span><span style="font-size:30px;">&#8250;</span></a></p>
+    <p><a href="{% url "shop_app:product_list_by_category" 'sink'%}"><span>Кухонные мойки</span><span style="font-size:30px;">&#8250;</span></a></p>
+    <p><a href="{% url "shop_app:product_list_by_category" 'furniture'%}"><span>Мебель для ванной</span><span style="font-size:30px;">&#8250;</span></a></p>
+    <p><a href="{% url "shop_app:product_list_by_category" 'towel_rail'%}"><span>Полотенцесушитель</span><span style="font-size:30px;">&#8250;</span></a></p>
+    <p><a href="{% url "shop_app:product_list_by_category" 'sanfayance'%}"><span>Санфаянс</span><span style="font-size:30px;">&#8250;</span></a></p>
+    <p><a href="{% url "shop_app:product_list_by_category" 'faucet'%}"><span>Смесители и системы для душа</span><span style="font-size:30px;">&#8250;</span></a></p>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() { // Ensure DOM is loaded
+    const popupCatalog = document.getElementById("popup_catalog");
+    const popupC = document.getElementById("popup_c");
+
+    function showPopupC() {
+        popupCatalog.style.display = "block";
+    }
+
+    function hidePopupC() {
+        popupCatalog.style.display = "none";
+    }
+
+    popupCatalog.addEventListener("click", hidePopupC);
+    popupC.addEventListener("click", (event) => event.stopPropagation());
+
+    const showCatalog = document.getElementById("show-catalog");
+        showCatalog.addEventListener("click", showPopupC);
+});
+</script>
+</body>
+</html>

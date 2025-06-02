@@ -1,0 +1,120 @@
+{% extends "shop_app/base.html" %}
+{% load static %}
+{% block title %}
+    {% if category %}{{ category }}{% else %}Products{% endif %}
+{% endblock %}
+{% block content %}
+    <div id="main" class="product-list">
+	<div class="way">
+	<a href="/">Главная</a>/{% if category %}{{ category}}{% else %}Товары{% endif %}
+	</div>
+        <h1>{% if category %}{{ category}}{% else %}Товары{% endif %}</h1>
+<hr>
+<div id="sidebar">
+<div class="sidebar-block">
+<h3>Фильтровать</h3>
+<form method="GET" action="">
+<details>
+    <summary>Цена</summary>
+    <div>
+        {{ price_form.price_min.label_tag }} {{ price_form.price_min }}
+        {{ price_form.price_max.label_tag }} {{ price_form.price_max }}
+    </div>
+</details>
+<hr>
+
+<details>
+    <summary>Производитель</summary>
+    <div>
+        <div>
+        {{ maker_filter_form.all_makers }} {{ maker_filter_form.fields.all_makers.label }}
+    	</div>
+    	{{ maker_filter_form.makers }}
+    </div>
+</details>
+<hr>
+    
+<details>
+    <summary>Цвет</summary>
+    <div>
+        <div>
+        {{ color_filter_form.all_colors }} {{ color_filter_form.fields.all_colors.label }}
+    	</div>
+    	{{ color_filter_form.colors }}
+    </div>
+</details>
+<hr>
+
+<details>
+    <summary>Материал</summary>
+    <div>
+        <div>
+        {{ material_filter_form.all_materials }} {{ material_filter_form.fields.all_materials.label }}
+    	</div>
+    	{{ material_filter_form.materials }}
+    </div>
+</details>
+
+    
+
+<button type="submit">Применить фильтры</button>
+</form>
+</div>
+</div>
+<div style="margin: 0 0 0 280px;">
+	
+	<p style="margin-left:15px;"><b>Сортировать:</b>
+	    <a href="?sort=price_asc"{% if sort == 'price_asc' %} class="active"{%else%} class="normal"{% endif %}>подешевле</a>
+	    <a href="?sort=price_desc"{% if sort == 'price_desc' %} class="active"{%else%} class="normal"{% endif %}>подороже</a>
+	    <a href="?sort=alphabetical"{% if sort == 'alphabetical' %} class="active"{%else%} class="normal"{% endif %}>по алфавиту</a>
+	</p>
+{%if products|length == 0%}
+<h1 style="text-align:center; margin-top:100px;">Упс, здесь ничего нет...</h1>
+<p style="text-align:center;">Попробуйте изменить фильтры или позвоните нам</p>
+
+{%else%}
+        {% for product in products %}
+            <div class="item" id="item_{{product.product.id}}">
+                <a href="{{ product.product.get_absolute_url }}">
+                    <img src="{% if product.product.image %}{{ product.product.image.url }}{% else %}{% static "images/empty.jpg" %}{% endif %}">
+		    <p><b>{{ product.product.name }}</b></p>
+		    <p>{{ product.product.maker}}</p>
+		    <p style="font-size: 24px;"><b>{{ product.product.price }} &#8381;</b></p>
+		    </a>
+		{%if product.product.id|stringformat:'s' in cart.get_keys%}
+		{%for item in cart%}
+		{%if item.product == product.product%}
+		    <form action="{% url "cart:cart_add" product.product.id %}" method="post" class="cart-form">
+			<input type="submit" value="-" onClick="change('quantity{{product.product.id}}',1,10,-1);"/>
+			<input type="text" value={{item.quantity}} name="quantity" id="quantity{{product.product.id}}">
+			<input type="text" value={{category}} name="category" hidden>
+			<input type="submit" value="+" onClick="change('quantity{{product.product.id}}',1,10,1);"/>
+    			{% csrf_token %}
+		    </form>
+		{%endif%}
+		{%endfor%}
+			<a class="button">&#10004; В корзине</a>
+		{%else%}
+		    <a href="{% url "cart:cart_add_one" product.product.id %}" class="prod_button"><img src="{% static "images/cart.png" %}" class="img_cart"> В корзину</a>
+		{%endif%}
+                
+                
+            </div>
+        {% endfor %}
+{%endif%}
+    </div>
+
+</div>
+
+
+<script>
+function change(objName, min, max, step) {
+var obj = document.getElementById(objName);
+var tmp = +obj.value + step;
+if (tmp<min) tmp=min;
+if (tmp>max) tmp=max;
+obj.value = tmp;
+}
+</script>
+
+{% endblock %}

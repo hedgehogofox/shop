@@ -1,0 +1,84 @@
+{% extends "shop_app/base.html" %}
+{% load static %}
+{% block title %}
+    {% if category %}{{ category.title }}{% else %}Products{% endif %}
+{% endblock %}
+{% block content %}
+    <div class="product-detail">
+	<div class="way">
+	<a href="/">Главная</a>/<a href="{% url "shop_app:product_list_by_category" category_str%}">{{category}}</a>/{{ product.name }}
+	</div>
+        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static "images/empty.jpg" %}{% endif %}" class="prod_img">
+	<p>Арт. {{product.art}}</p>
+	<p><b>{{product.maker}}</b></p>
+        <h1>{{ product.name }}</h1>
+        <h2><a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></h2>
+        <p class="price">{{ product.price }} &#8381;</p>
+	{%if product.id|stringformat:'s' in cart.get_keys%}
+		{%for item in cart%}
+		{%if item.product == product%}
+		    <form action="{% url "cart:cart_add" product.id %}" method="post" class="cart-form">
+			<input type="submit" value="-" onClick="change('quantity{{product.id}}',1,10,-1);"/>
+			<input type="text" value={{item.quantity}} name="quantity" id="quantity{{product.id}}">
+			<input type="text" value="Деталь" name="category" hidden>
+			<input type="submit" value="+" onClick="change('quantity{{product.id}}',1,10,1);"/>
+    			{% csrf_token %}
+		    </form>
+		{%endif%}
+		{%endfor%}
+			<a class="button">&#10004; В корзине</a>
+	{%else%}
+		<div class="call_b_c"><a href="{% url "cart:cart_add_one" product.id %}" class="prod_button"><img src="{% static "images/cart.png" %}" class="img_cart"> В корзину</a></div>
+	{%endif%}
+	
+	<div class="book">
+  	<h3>Основные характеристики</h3>
+  	{%if product.material%}
+  	<p><span>Материал</span><span>{{product.material}}</span></p>
+  	{%endif%}
+  	{%if product.color%}
+  	<p><span>Цвет</span><span>{{product.color}}</span></p>
+  	{%endif%}
+  	{%if product.material%}
+  	<p><span>Материал</span><span>{{product.material}}</span></p>
+  	{%endif%}
+  	{%if category == 'Ванны и поддоны'%}
+  		{%if product_category.length%}
+   	        <p><span>Длина</span><span>{{product_category.length}} см</span></p>
+  		{%endif%}
+		{%if product_category.width%}
+        	<p><span>Ширина</span><span>{{product_category.width}} см</span></p>
+  		{%endif%}
+		{%if product_category.depth%}
+        	<p><span>Глубина</span><span>{{product_category.depth}} см</span></p>
+  		{%endif%}
+		{%if product_category.thickness%}
+        	<p><span>Толщина</span><span>{{product_category.thickness}} мм</span></p>
+  		{%endif%}
+		{%if product_category.completeness%}
+        	<p><span>Комплектность</span><span>{{product_category.completeness}}</span></p>
+  		{%endif%}
+		{%if product_category.coating%}
+        	<p><span>Антискользящее покрытие</span><span>да</span></p>
+  		{%endif%}
+		{%if product_category.hydromassage%}
+        	<p><span>Гидромассаж</span><span>да</span></p>
+  		{%endif%}
+		{%if product_category.form%}
+        	<p><span>Форма</span><span>{{product_category.form}}</span></p>
+  		{%endif%}
+  	{%endif%}
+	</div>
+    </div>
+
+
+<script>
+function change(objName, min, max, step) {
+var obj = document.getElementById(objName);
+var tmp = +obj.value + step;
+if (tmp<min) tmp=min;
+if (tmp>max) tmp=max;
+obj.value = tmp;
+}
+</script>
+{% endblock %}

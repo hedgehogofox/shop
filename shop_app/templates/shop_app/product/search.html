@@ -1,0 +1,57 @@
+{% extends "shop_app/base.html" %}
+{% load static %}
+{% block title %}
+    Search
+{% endblock %}
+{% block content %}
+    <div id="main" class="product-list">
+        <h1>Результаты поиска по запросу "{{q}}"</h1>
+	<hr>
+        {%if products|length == 0%}
+<h1 style="text-align:center; margin-top:100px;">Упс, здесь ничего нет...</h1>
+<p style="text-align:center;">Попробуйте изменить фильтры или позвоните нам</p>
+
+{%else%}
+        {% for product in products %}
+            <div class="item" id="item_{{product.id}}" style="margin:3px;">
+                <a href="{{ product.get_absolute_url }}">
+                    <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static "images/empty.jpg" %}{% endif %}">
+		    <p><b>{{ product.name }}</b></p>
+		    <p>{{ product.maker}}</p>
+		    <p style="font-size: 24px;"><b>{{ product.price }} &#8381;</b></p>
+		    </a>
+		    {%if product.id|stringformat:'s' in cart.get_keys%}
+		{%for item in cart%}
+		{%if item.product == product%}
+		    <form action="{% url "cart:cart_add" product.id %}" method="post" class="cart-form">
+			<input type="submit" value="-" onClick="change('quantity{{product.id}}',1,10,-1);"/>
+			<input type="text" value={{item.quantity}} name="quantity" id="quantity{{product.id}}">
+			<input type="text" value={{q}} name="q" hidden>
+			<input type="submit" value="+" onClick="change('quantity{{product.id}}',1,10,1);"/>
+    			{% csrf_token %}
+    			
+		    </form>
+		{%endif%}
+		{%endfor%}
+			<a class="button">&#10004; В корзине</a>
+		    {%else%}
+		    <a href="{% url "cart:cart_add_one" product.id %}" class="prod_button"><img src="{% static "images/cart.png" %}" class="img_cart"> В корзину</a>
+		    {%endif%}
+                
+                
+            </div>
+        {% endfor %}
+{%endif%}
+    </div>
+
+
+<script>
+function change(objName, min, max, step) {
+var obj = document.getElementById(objName);
+var tmp = +obj.value + step;
+if (tmp<min) tmp=min;
+if (tmp>max) tmp=max;
+obj.value = tmp;
+}
+</script>
+{% endblock %}

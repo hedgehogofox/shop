@@ -1,0 +1,99 @@
+{% extends "shop_app/base.html" %}
+{% load static %}
+{% block title %}
+    Your shopping cart
+{% endblock %}
+{% block content %}
+{% if cart|length > 0 %}
+    <h1>Ваша корзина</h1>
+    <div class="order-info">
+        <h3>Ваш заказ</h3>
+	<div class="book">
+  	<p><span>Итоговая сумма товаров</span><span>{{ cart.get_total_price }} &#8381;</span></p>
+	</div>
+        <p><a id="show-order-form-button" class="button">Оформить заказ</a></p>
+    </div>
+    <table class="table_cart">
+        <tbody>
+        {% for item in cart %}
+            {% with product=item.product %}
+                <tr>
+                    <td style="width:180px;">
+                        <a href="{{ product.get_absolute_url }}">
+                            <img src="
+                                {% if product.image %}
+                                    {{ product.image.url }}
+                                {% else %}
+                                    {% static "images/empty.jpg" %}
+                                {% endif %}">
+                        </a>
+                    </td>
+                    <td>
+			<p style='color: rgba(102, 102, 102, 1);'>Арт. {{ product.art }}</p>
+			<p><b>{{ product.name }}</b></p>
+			<p style="line-height: 100px;"><a href="{% url "cart:cart_remove" product.id%}" class="del_button">&#10006; Удалить</a><p>
+		    </td>
+		    <td>
+			<p style='color: rgba(102, 102, 102, 1);'>Цена</p>
+			<p style='color: rgba(11, 93, 165, 1);'><b>{{ item.price }} &#8381;</b></p>
+		    </td>
+		    <td>
+			<p style='color: rgba(102, 102, 102, 1);'>Количество</p>
+			<p><form action="{% url "cart:cart_add" product.id %}" method="post" class="cart-form">
+			<input type="submit" value="-" onClick="change('quantity{{product.id}}',1,10,-1);"/>
+			<input type="text" value={{item.quantity}} name="quantity" id="quantity{{product.id}}">
+			<input type="submit" value="+" onClick="change('quantity{{product.id}}',1,10,1);"/>
+    			{% csrf_token %}
+		    </form></p>
+		    </td>
+                </tr>
+            {% endwith %}
+        {% endfor %}
+    </table>
+{%else%}
+	<div class="empty_cart">
+		<h1>В корзине пока пусто</h1>
+		<p><img src="{% static "images/cart_empty.png" %}" class="prod_img"></p>
+		<p><a href="/" class="button">Перейти в каталог &#8594;</a></p>
+	</div>
+{%endif%}
+
+<div id="popup-overlay">
+    <div id="popup">
+    <a class="close" id="close">&#10006;</a>
+    <h1>Оформить заказ</h1>
+    <p style="color: rgba(102, 102, 102, 1); font-size:16px;">Оставьте заявку на обратный звонок, и мы свяжемся с вами в течение дня в рабочее время</p>
+    <form action="." method="post" class="order-form">
+        {{ form.as_p }}
+	<p style="color: rgba(102, 102, 102, 1); font-size:14px;">* - обязательно для заполнения</p>
+        <p><input type="submit" value="Оформить заказ"></p>
+    {% csrf_token %}
+    </form>
+    
+    <p style="color: rgba(102, 102, 102, 1); font-size:14px;">Нажимая на кнопку, вы даёте согласие на обработку персональных данных и соглашаетесь с политикой конфиденциальности.</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() { // Ensure DOM is loaded
+    const popupOverlay = document.getElementById("popup-overlay");
+    const popup = document.getElementById("popup");
+
+    function showPopup() {
+        popupOverlay.style.display = "block";
+    }
+
+    function hidePopup() {
+        popupOverlay.style.display = "none";
+    }
+
+    popupOverlay.addEventListener("click", hidePopup);
+    popup.addEventListener("click", (event) => event.stopPropagation());
+
+    const showOrderFormButton = document.getElementById("show-order-form-button");
+        showOrderFormButton.addEventListener("click", showPopup);
+    const closeOrderFormButton = document.getElementById("close");
+        closeOrderFormButton.addEventListener("click", hidePopup);
+});
+</script>
+{% endblock %}
